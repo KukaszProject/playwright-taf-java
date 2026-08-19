@@ -1,5 +1,7 @@
 package com.demo.taf.driver;
 
+import com.microsoft.playwright.APIRequest;
+import com.microsoft.playwright.APIRequestContext;
 import com.microsoft.playwright.Browser;
 import com.microsoft.playwright.BrowserContext;
 import com.microsoft.playwright.Page;
@@ -11,6 +13,8 @@ public class PlaywrightManager {
     private static final ThreadLocal<Browser> BROWSER = new ThreadLocal<>();
     private static final ThreadLocal<BrowserContext> CONTEXT = new ThreadLocal<>();
     private static final ThreadLocal<Page> PAGE = new ThreadLocal<>();
+
+    private static final ThreadLocal<APIRequestContext> API_REQUEST = new ThreadLocal<>();
 
     private PlaywrightManager() {
         // Private constructor to prevent instantiation
@@ -32,6 +36,17 @@ public class PlaywrightManager {
         }
     }
 
+    public static void initApiContext(String baseApiUrl) {
+        if(PLAYWRIGHT.get() == null) {
+            PLAYWRIGHT.set(Playwright.create());
+        }
+
+        APIRequestContext requestContext = PLAYWRIGHT.get().request().newContext(
+            new APIRequest.NewContextOptions().setBaseURL(baseApiUrl)
+        );
+        API_REQUEST.set(requestContext);
+    }
+
     public static Page getPage() {
         return PAGE.get();
     }
@@ -40,15 +55,21 @@ public class PlaywrightManager {
         return CONTEXT.get();
     }
 
+    public static APIRequestContext getApiContext() {
+        return API_REQUEST.get();
+    }
+
     public static void closeDriver() {
         if (PAGE.get() != null) PAGE.get().close();
         if (CONTEXT.get() != null) CONTEXT.get().close();
         if (BROWSER.get() != null) BROWSER.get().close();
+        if (API_REQUEST.get() != null) API_REQUEST.get().dispose();
         if (PLAYWRIGHT.get() != null) PLAYWRIGHT.get().close();
 
         PAGE.remove();
         CONTEXT.remove();
         BROWSER.remove();
+        API_REQUEST.remove();
         PLAYWRIGHT.remove();
     }
     
