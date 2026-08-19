@@ -15,6 +15,7 @@ public class LoginPage extends BasePage {
     
     public LoginPage load(String baseUrl) {
         navigateTo(baseUrl + "/login");
+        acceptCookiesIfPresent();
         return this;
     }
 

@@ -12,7 +12,7 @@ public class ApiBaseTest {
 
     @BeforeEach
     public void setUpApi() {
-        PlaywrightManager.initApiContext(CONFIG.baseApiUrl());
+        PlaywrightManager.initApiContext(CONFIG.baseApiUrl(), CONFIG.apiToken());
     }
 
     @AfterEach
