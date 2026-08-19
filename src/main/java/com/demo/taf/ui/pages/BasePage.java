@@ -1,10 +1,13 @@
 package com.demo.taf.ui.pages;
 
+
+import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 
 public abstract class BasePage {
 
     protected final Page page;
+    private final String cookieConsentBtn = "button.fc-button.fc-cta-consent";
 
     public BasePage(Page page) {
         this.page = page;
@@ -15,6 +18,21 @@ public abstract class BasePage {
      */
     public void navigateTo(String url) {
         page.navigate(url);
+    }
+
+    /**
+     * Accepts cookies if the cookie consent button is present on the page.
+     */
+    protected void acceptCookiesIfPresent() {
+        Locator consentButton = page.locator(cookieConsentBtn);
+        try {
+            consentButton.waitFor(new Locator.WaitForOptions().setTimeout(3000));
+            if (consentButton.isVisible()) {
+                consentButton.click();
+            }
+        } catch (Exception e) {
+            // No cookie consent button found, proceed without action
+        }
     }
 
     /**
