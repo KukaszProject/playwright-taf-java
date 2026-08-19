@@ -1,0 +1,19 @@
+# Maven
+target/
+
+# IDEs
+.idea/
+*.iml
+.vscode/
+*.eclipse
+
+# Playwright & Test Results
+test-results/
+playwright-report/
+allure-results/
+allure-report/
+logs/
+*.log
+
+# OS
+.DS_Store
