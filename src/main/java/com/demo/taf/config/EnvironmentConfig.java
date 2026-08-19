@@ -20,4 +20,13 @@ public interface EnvironmentConfig extends Config {
     @Key("headless")
     @DefaultValue("true")
     boolean headless();
+
+    @Key("db.url")
+    String dbUrl();
+
+    @Key("db.user")
+    String dbUser();
+
+    @Key("db.password")
+    String dbPassword();
 }
