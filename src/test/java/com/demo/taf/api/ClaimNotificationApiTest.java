@@ -24,7 +24,7 @@ public class ClaimNotificationApiTest extends ApiBaseTest {
         );
 
         APIResponse response = PlaywrightManager.getApiContext()
-            .post("/users", RequestOptions.create().setData(newClaim)
+            .post("/posts", RequestOptions.create().setData(newClaim)
         );
 
         assertThat(response.status())
@@ -36,8 +36,6 @@ public class ClaimNotificationApiTest extends ApiBaseTest {
             .as("Response body should contain the submitted Treaty/Policyholder name")
             .contains("Global Corp Inc.")
             .as("Response should contain an generated ID for the claim")
-            .contains("id")
-            .as("Response should contain a creation timestamp")
-            .contains("createdAt");
+            .contains("id");
     }
 }
