@@ -38,4 +38,61 @@ public class ClaimNotificationApiTest extends ApiBaseTest {
             .as("Response should contain an generated ID for the claim")
             .contains("id");
     }
+
+    @Test
+    @DisplayName("API: Retrieve Existing Claim (GET) successfully")
+    void testGetClaimDetails() {
+        APIResponse response = PlaywrightManager.getApiContext().get("/posts/1");
+
+        assertThat(response.status())
+            .as("Expected HTTP 200 OK for existing claim retrieval")
+            .isEqualTo(200);
+
+        assertThat(response.text())
+            .as("Response should contain the userId for the claim")
+            .contains("userId");
+    }
+
+    @Test
+    @DisplayName("API: Update Existing Claim (PUT) successfully")
+    void testUpdateClaimStatus() {
+        String updatePayload = """
+                {
+                    "id": 1,
+                    "title": "Updated: Claim Title",
+                    "body": "Reserve increased to 3.0M USD due to severe roof damage",
+                    "userId": 1
+                }
+                """;
+
+        APIResponse response = PlaywrightManager.getApiContext()
+            .put("/posts/1", RequestOptions.create().setData(updatePayload));
+
+        assertThat(response.status())
+            .as("Expected HTTP 200 OK for claim update")
+            .isEqualTo(200);
+        assertThat(response.text())
+            .as("Response should contain the updated claim title")
+            .contains("Updated: Claim Title");
+    }
+
+    @Test
+    @DisplayName("API: Delete Processed Claim (DELETE) successfully")
+    void testDeleteClaim() {
+        APIResponse response = PlaywrightManager.getApiContext().delete("/posts/1");
+
+        assertThat(response.status())
+            .as("Expected HTTP 200 OK for claim deletion")
+            .isEqualTo(200);
+    }
+
+    @Test
+    @DisplayName("API Negative: Fetch Non-Existent Claim (GET) should return 404")
+    void testFetchNonExistentClaim() {
+        APIResponse response = PlaywrightManager.getApiContext().get("/posts/9999");
+
+        assertThat(response.status())
+            .as("Expected HTTP 404 Not Found for non-existent claim")
+            .isEqualTo(404);
+    }
 }
