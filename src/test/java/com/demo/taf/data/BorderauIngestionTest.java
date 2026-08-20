@@ -8,32 +8,16 @@ import java.sql.Statement;
 import java.util.stream.Stream;
 
 import static org.assertj.core.api.Assertions.assertThat;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.BeforeAll;
+import static org.junit.jupiter.api.Assertions.assertThrows;
+import org.junit.jupiter.api.DisplayName;
+import org.junit.jupiter.api.Test;
 import org.junit.jupiter.params.ParameterizedTest;
 import org.junit.jupiter.params.provider.MethodSource;
 
+import com.demo.taf.base.DatabaseBaseTest;
 import com.demo.taf.data.models.BorderauRecord;
 
-public class BorderauIngestionTest {
-
-    @BeforeAll
-    static void setUpDatabase() throws SQLException {
-        try (Connection connection = DatabaseManager.getConnection()) {
-            Statement statement = connection.createStatement();
-
-            String createTableSql = """
-                CREATE TABLE IF NOT EXISTS claims_bordereau (
-                    claim_id VARCHAR(50) PRIMARY KEY,
-                    cedent_name VARCHAR(100),
-                    treaty_reference VARCHAR(50),
-                    reserve_amount DECIMAL(15, 2),
-                    status VARCHAR(20)
-                )
-            """;
-            statement.execute(createTableSql);
-        }
-    }
+public class BorderauIngestionTest extends DatabaseBaseTest {
 
     static Stream<BorderauRecord> borderauDataProvider() {
         return Stream.of(
@@ -77,9 +61,48 @@ public class BorderauIngestionTest {
         }
     }
 
-    @AfterAll
-    static void tearDownDatabase() {
-        DatabaseManager.closePool();
+    @Test
+    @DisplayName("Data Pipeline: Update existing Reserve Amount (UPDATE)")
+    public void testUpdateReserveAmount() throws SQLException {
+        
+        String insertSql = "INSERT INTO claims_bordereau (claim_id, cedent_name, reserve_amount, status) " +
+                           "VALUES ('CLM-UPDATE-01', 'Test Re', 500.00, 'OPEN')";
+
+        String updateSql = "UPDATE claims_bordereau SET reserve_amount = 999.99 WHERE claim_id = 'CLM-UPDATE-01'";
+        
+        String selectSql = "SELECT reserve_amount FROM claims_bordereau WHERE claim_id = 'CLM-UPDATE-01'";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            stmt.execute(insertSql);
+            
+            int rowsAffected = stmt.executeUpdate(updateSql);
+            assertThat(rowsAffected).as("One row should be updated").isEqualTo(1);
+            
+            try (ResultSet rs = stmt.executeQuery(selectSql)) {
+                rs.next();
+                assertThat(rs.getDouble("reserve_amount"))
+                    .as("Reserve amount should reflect the newly updated value")
+                    .isEqualTo(999.99);
+            }
+        }
     }
-    
+
+    @Test
+    @DisplayName("Data Pipeline Negative: Reject invalid data type mapping")
+    void testDatabaseRejectsInvalidData() {
+        String invalidInsertSql = "INSERT INTO claims_bordereau (claim_id, reserve_amount) " +
+                                  "VALUES ('CLM-ERR-01', 'INVALID_STRING')";
+
+        try (Connection conn = DatabaseManager.getConnection();
+             Statement stmt = conn.createStatement()) {
+            
+            assertThrows(SQLException.class, () -> {
+                stmt.execute(invalidInsertSql);
+            }, "Database should strictly enforce schema constraints and throw an SQLException");
+            
+        } catch (SQLException e) {
+        }
+    }
 }
