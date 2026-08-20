@@ -66,8 +66,8 @@ jobs:
       
       - name: 4. Run Tests on [${{ matrix.environment }}]
         env:
-          api.token: ${{ secrets.API_TOKEN }}
-          db.password: ${{ secrets.DB_PASSWORD }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: mvn clean test -Denv=${{ matrix.environment }}
 
       - name: 5. Upload Allure Results Artifact
