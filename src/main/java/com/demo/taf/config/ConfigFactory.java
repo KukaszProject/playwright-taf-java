@@ -24,6 +24,13 @@ public final class ConfigFactory {
             throw new RuntimeException("Failed to load properties file: " + e.getMessage(), e);
         }
 
+        if (System.getenv("API_TOKEN") != null) {
+            props.setProperty("api.token", System.getenv("API_TOKEN"));
+        }
+        if (System.getenv("DB_PASSWORD") != null) {
+            props.setProperty("db.password", System.getenv("DB_PASSWORD"));
+        }
+
         return org.aeonbits.owner.ConfigFactory.create(
                 EnvironmentConfig.class, 
                 props, 
