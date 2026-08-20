@@ -52,10 +52,10 @@ jobs:
     
     steps:
       - name: 1. Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 2. Set up JDK 17
-        uses: actions/setup-java@v4
+        uses: actions/setup-java@v5
         with:
           java-version: '17'
           distribution: 'temurin'
@@ -66,12 +66,12 @@ jobs:
       
       - name: 4. Run Tests on [${{ matrix.environment }}]
         env:
-          api.token: ${{ secrets.API_TOKEN }}
-          db.password: ${{ secrets.DB_PASSWORD }}
+          API_TOKEN: ${{ secrets.API_TOKEN }}
+          DB_PASSWORD: ${{ secrets.DB_PASSWORD }}
         run: mvn clean test -Denv=${{ matrix.environment }}
 
       - name: 5. Upload Allure Results Artifact
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         if: always() 
         with:
           name: allure-results-${{ matrix.environment }}
@@ -84,10 +84,10 @@ jobs:
     if: always() 
     steps:
       - name: 1. Checkout Repository
-        uses: actions/checkout@v4
+        uses: actions/checkout@v5
 
       - name: 2. Download Allure Results from all environments
-        uses: actions/download-artifact@v4
+        uses: actions/download-artifact@v5
         with:
           path: target/allure-results
           pattern: allure-results-*
