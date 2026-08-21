@@ -1,5 +1,6 @@
 package com.demo.taf.driver;
 
+import java.nio.file.Paths;
 import java.util.Map;
 
 import com.microsoft.playwright.APIRequest;
@@ -28,7 +29,11 @@ public class PlaywrightManager {
             Browser browser = BrowserFactory.createBrowser(playwright);
             BROWSER.set(browser);
 
-            BrowserContext context = browser.newContext();
+            Browser.NewContextOptions options = new Browser.NewContextOptions()
+                .setRecordVideoDir(Paths.get("target/videos/")) // Saves videos to the target folder
+                .setRecordVideoSize(1280, 720);
+
+            BrowserContext context = browser.newContext(options);
             CONTEXT.set(context);
 
             Page page = context.newPage();
