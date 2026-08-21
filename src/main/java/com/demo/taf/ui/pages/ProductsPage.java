@@ -15,6 +15,9 @@ public class ProductsPage extends BasePage {
     private final String allProductsHeader = "h2.title.text-center:has-text('All Products')";
     private final String searchResults = "div.productinfo p";
     private final String viewProductButton = "ul.nav-pills a[href^='/product_details']";
+    private final String productCard = ".single-products"; 
+    private final String overlayAddToCartButton = ".product-overlay .add-to-cart";
+    private final String viewCartLink = "#cartModal a[href='/view_cart']";
     
     public ProductsPage(Page page) {
         super(page);
@@ -59,5 +62,19 @@ public class ProductsPage extends BasePage {
         page.locator(searchResults).first().waitFor();
         
         return page.locator(searchResults).allTextContents();
+    }
+
+    @Step("Add the first visible product to the cart")
+    public ProductsPage addFirstProductToCart() {
+        page.locator(productCard).first().hover();      
+        page.locator(overlayAddToCartButton).first().click();
+        
+        return this;
+    }
+
+    @Step("Navigate to the Cart page via the success modal")
+    public void goToCartFromModal() {
+        page.locator(viewCartLink).waitFor();
+        page.locator(viewCartLink).click();
     }
 }
