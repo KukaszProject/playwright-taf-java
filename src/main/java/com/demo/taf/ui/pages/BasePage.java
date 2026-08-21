@@ -3,6 +3,7 @@ package com.demo.taf.ui.pages;
 
 import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
+import com.microsoft.playwright.options.WaitForSelectorState;
 
 public abstract class BasePage {
 
@@ -18,6 +19,7 @@ public abstract class BasePage {
      */
     public void navigateTo(String url) {
         page.navigate(url);
+        acceptCookiesIfPresent();
     }
 
     /**
@@ -39,21 +41,27 @@ public abstract class BasePage {
      * Types the specified text into the given locator.
      */
     protected void type(String selector, String text) {
+        page.locator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         page.locator(selector).clear();
-        page.locator(selector).fill(text);
+        page.locator(selector).fill(text != null ? text : "");
     }
 
     /**
      * Retrieves the text content of the specified locator.
      */
     protected String getText(String selector) {
-        return page.locator(selector).textContent();
+        page.locator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
+        return page.locator(selector).textContent().trim();
     }
 
     /**
      * Checks if the specified locator is visible on the page.
      */
     protected boolean isVisible(String selector) {
-        return page.locator(selector).isVisible();
+        try {
+            return page.locator(selector).isVisible();
+        } catch (Exception e) {
+            return false;
+        }
     }
 }
