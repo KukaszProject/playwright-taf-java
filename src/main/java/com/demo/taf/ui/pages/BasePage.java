@@ -5,6 +5,8 @@ import com.microsoft.playwright.Locator;
 import com.microsoft.playwright.Page;
 import com.microsoft.playwright.options.WaitForSelectorState;
 
+import io.qameta.allure.Step;
+
 public abstract class BasePage {
 
     protected final Page page;
@@ -17,6 +19,7 @@ public abstract class BasePage {
     /**
      * Navigates to the specified URL.
      */
+    @Step("Navigating to URL: {url}")
     public void navigateTo(String url) {
         page.navigate(url);
         acceptCookiesIfPresent();
@@ -25,6 +28,7 @@ public abstract class BasePage {
     /**
      * Accepts cookies if the cookie consent button is present on the page.
      */
+    @Step("Accepting cookies if present")
     protected void acceptCookiesIfPresent() {
         Locator consentButton = page.locator(cookieConsentBtn);
         try {
@@ -40,6 +44,7 @@ public abstract class BasePage {
     /**
      * Types the specified text into the given locator.
      */
+    @Step("Typing text: {text} into selector: {selector}")
     protected void type(String selector, String text) {
         page.locator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         page.locator(selector).clear();
@@ -49,6 +54,7 @@ public abstract class BasePage {
     /**
      * Retrieves the text content of the specified locator.
      */
+    @Step("Retrieving text from selector: {selector}")
     protected String getText(String selector) {
         page.locator(selector).waitFor(new Locator.WaitForOptions().setState(WaitForSelectorState.VISIBLE));
         return page.locator(selector).textContent().trim();
@@ -57,6 +63,7 @@ public abstract class BasePage {
     /**
      * Checks if the specified locator is visible on the page.
      */
+    @Step("Checking if selector is visible: {selector}")
     protected boolean isVisible(String selector) {
         try {
             return page.locator(selector).isVisible();

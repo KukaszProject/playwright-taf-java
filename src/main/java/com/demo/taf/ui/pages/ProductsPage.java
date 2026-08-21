@@ -4,6 +4,8 @@ import java.util.List;
 
 import com.microsoft.playwright.Page;
 
+import io.qameta.allure.Step;
+
 public class ProductsPage extends BasePage {
     
     private final String productsLink = "a[href='/products']";
@@ -18,13 +20,16 @@ public class ProductsPage extends BasePage {
         super(page);
     }
 
+    @Step("Navigating to the Products page")
     public ProductsPage navigateToProducts() {
         acceptCookiesIfPresent(); 
         page.locator(productsLink).click();
+        page.waitForLoadState();
 
         return this;
     }
 
+    @Step("Searching for product: {productName}")
     public ProductsPage searchFor(String productName) {
         type(searchInput, productName);
         page.locator(searchButton).click();
@@ -32,30 +37,24 @@ public class ProductsPage extends BasePage {
         return this;
     }
 
+    @Step("Checking if 'Searched Products' header is visible")
     public boolean isSearchedProductsHeaderVisible() {
-        try {
-            page.locator(searchedProductsHeader).waitFor();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        page.locator(searchedProductsHeader).waitFor();
+        return true;
     }
 
-    // NEW METHOD: Wait for default page to load
+    @Step("Checking if 'All Products' header is visible")
     public boolean isAllProductsHeaderVisible() {
-        try {
-            page.locator(allProductsHeader).waitFor();
-            return true;
-        } catch (Exception e) {
-            return false;
-        }
+        page.locator(allProductsHeader).waitFor();
+        return true;
     }
 
-    // NEW METHOD: Click the first product details link
+    @Step("Clicking the first 'View Product' button")
     public void clickFirstViewProduct() {
         page.locator(viewProductButton).first().click();
     }
 
+    @Step("Retrieving search results")
     public List<String> getSearchResults() {
         page.locator(searchResults).first().waitFor();
         
